@@ -31,6 +31,16 @@ const StepReveal = ({ onNext }: Props) => {
         IT'S RIA!!!
       </motion.h1>
 
+      <motion.p
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.9 }}
+        className="text-2xl font-bold text-secondary-foreground mb-4"
+        style={{ color: "#c084fc" }}
+      >
+        our beloved tiny monster 👾
+      </motion.p>
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -49,7 +59,7 @@ const StepReveal = ({ onNext }: Props) => {
         transition={{ delay: 1.8 }}
         className="text-muted-foreground text-lg mb-2 max-w-xs"
       >
-        The world's most ✨vertically efficient✨ queen turns 17!
+        The world's most ✨vertically efficient✨ tiny monster turns 17!
       </motion.p>
 
       <motion.p
