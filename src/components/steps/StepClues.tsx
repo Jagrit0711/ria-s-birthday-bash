@@ -6,12 +6,12 @@ interface Props {
 }
 
 const clues = [
-  { emoji: "📏", text: "This person is... vertically challenged 🤏", subtext: "(if you know, you know)" },
-  { emoji: "👓", text: "They wear glasses", subtext: "(and look absolutely adorable in them)" },
-  { emoji: "🌋", text: "They have a VERY short temper", subtext: "(short person, short fuse, coincidence? 🤔)" },
-  { emoji: "💀", text: "They have... unique fantasies about the afterlife", subtext: "(we don't question it, we just support)" },
-  { emoji: "🤪", text: "They go from 0 to crazy in 0.2 seconds", subtext: "(it's actually impressive)" },
-  { emoji: "🤖", text: "They don't believe in AI", subtext: "(which makes this website even funnier)" },
+  { emoji: "📏", text: "This person is... vertically challenged 🤏", subtext: "(if you know, you know — tiny monster energy)" },
+  { emoji: "👓", text: "They wear glasses", subtext: "(and look absolutely adorable in them, our tiny monster 🥺)" },
+  { emoji: "🌋", text: "They have a VERY short temper", subtext: "(short person, short fuse — classic tiny monster behavior 🤔)" },
+  { emoji: "💀", text: "They have... unique fantasies about the afterlife", subtext: "(we don't question the tiny monster, we just support)" },
+  { emoji: "🤪", text: "They go from 0 to crazy in 0.2 seconds", subtext: "(it's actually impressive for such a tiny monster)" },
+  { emoji: "🤖", text: "They don't believe in AI", subtext: "(which makes this website even funnier 😏)" },
 ];
 
 const StepClues = ({ onNext }: Props) => {
@@ -80,7 +80,7 @@ const StepClues = ({ onNext }: Props) => {
           className="text-center"
         >
           <p className="text-xl font-bold text-foreground mb-4">
-            Know who it is?? 😏
+            Know which tiny monster it is?? 😏
           </p>
           <motion.button
             whileHover={{ scale: 1.05 }}
