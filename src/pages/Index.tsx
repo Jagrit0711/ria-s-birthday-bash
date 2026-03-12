@@ -1,12 +1,21 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import Confetti from "@/components/Confetti";
+import HeroSection from "@/components/HeroSection";
+import FunFacts from "@/components/FunFacts";
+import RiaTrivia from "@/components/RiaTrivia";
+import ShipMeter from "@/components/ShipMeter";
+import BirthdayCam from "@/components/BirthdayCam";
+import Footer from "@/components/Footer";
 
 const Index = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-background overflow-x-hidden">
+      <Confetti />
+      <HeroSection />
+      <FunFacts />
+      <RiaTrivia />
+      <ShipMeter />
+      <BirthdayCam />
+      <Footer />
     </div>
   );
 };
