@@ -1,7 +1,5 @@
 import { motion } from "framer-motion";
 import { useRef, useState, useCallback, useEffect } from "react";
-import birthdayCap from "@/assets/birthday-cap.png";
-import partyGlasses from "@/assets/party-glasses.png";
 
 interface Props {
   onNext: () => void;
@@ -10,34 +8,15 @@ interface Props {
 const StepCamera = ({ onNext }: Props) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animFrameRef = useRef<number | null>(null);
   const [streaming, setStreaming] = useState(false);
   const [captured, setCaptured] = useState<string | null>(null);
-  const [filter, setFilter] = useState<"cap" | "glasses" | "both">("both");
-  const capImg = useRef<HTMLImageElement | null>(null);
-  const glassesImg = useRef<HTMLImageElement | null>(null);
+  const [filter, setFilter] = useState<"cap" | "glasses" | "both" | "none">("both");
 
-  useEffect(() => {
-    const cap = new Image();
-    cap.src = birthdayCap;
-    cap.onload = () => (capImg.current = cap);
-    const glasses = new Image();
-    glasses.src = partyGlasses;
-    glasses.onload = () => (glassesImg.current = glasses);
-  }, []);
-
-  const startCamera = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "user", width: 480, height: 480 },
-      });
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.play();
-        setStreaming(true);
-        setCaptured(null);
-      }
-    } catch {
-      alert("Camera access needed for the birthday magic! 📸");
+  const stopLoop = () => {
+    if (animFrameRef.current) {
+      cancelAnimationFrame(animFrameRef.current);
+      animFrameRef.current = null;
     }
   };
 
@@ -49,49 +28,66 @@ const StepCamera = ({ onNext }: Props) => {
     if (!ctx) return;
 
     const draw = () => {
-      if (!video.paused && !video.ended) {
-        canvas.width = video.videoWidth || 480;
-        canvas.height = video.videoHeight || 480;
+      if (!video.paused && !video.ended && video.readyState >= 2) {
+        const vw = video.videoWidth || 480;
+        const vh = video.videoHeight || 480;
+        canvas.width = vw;
+        canvas.height = vh;
+
+        // Mirror
         ctx.save();
-        ctx.translate(canvas.width, 0);
+        ctx.translate(vw, 0);
         ctx.scale(-1, 1);
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        ctx.drawImage(video, 0, 0, vw, vh);
         ctx.restore();
 
-        const w = canvas.width;
-        const h = canvas.height;
-
-        if ((filter === "cap" || filter === "both") && capImg.current) {
-          const capW = w * 0.4;
-          ctx.drawImage(capImg.current, w * 0.3, h * 0.02, capW, capW);
-        }
-        if ((filter === "glasses" || filter === "both") && glassesImg.current) {
-          const gW = w * 0.35;
-          ctx.drawImage(glassesImg.current, w * 0.33, h * 0.32, gW, gW * 0.6);
-        }
-
+        // Birthday text
         ctx.save();
-        ctx.font = `bold ${Math.floor(w * 0.055)}px Quicksand, sans-serif`;
+        ctx.font = `bold ${Math.floor(vw * 0.055)}px Quicksand, sans-serif`;
         ctx.fillStyle = "#ff6b9d";
         ctx.strokeStyle = "#ffffff";
         ctx.lineWidth = 3;
         ctx.textAlign = "center";
-        const text = "Happy Bday Ria! 🎂";
-        ctx.strokeText(text, w / 2, h * 0.95);
-        ctx.fillText(text, w / 2, h * 0.95);
+        const text = "Happy Bday Tiny Monster! 🎂";
+        ctx.strokeText(text, vw / 2, vh * 0.95);
+        ctx.fillText(text, vw / 2, vh * 0.95);
         ctx.restore();
-
-        requestAnimationFrame(draw);
       }
+
+      animFrameRef.current = requestAnimationFrame(draw);
     };
-    requestAnimationFrame(draw);
+
+    animFrameRef.current = requestAnimationFrame(draw);
   }, [filter]);
 
+  const startCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "user", width: 480, height: 480 },
+      });
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.onloadedmetadata = () => {
+          videoRef.current?.play();
+          setStreaming(true);
+          setCaptured(null);
+        };
+      }
+    } catch {
+      alert("Camera access needed for the birthday magic! 📸");
+    }
+  };
+
   useEffect(() => {
-    if (streaming) drawLoop();
+    if (streaming) {
+      stopLoop();
+      drawLoop();
+    }
+    return stopLoop;
   }, [filter, streaming, drawLoop]);
 
   const capture = () => {
+    stopLoop();
     if (canvasRef.current) setCaptured(canvasRef.current.toDataURL("image/png"));
   };
 
@@ -104,6 +100,7 @@ const StepCamera = ({ onNext }: Props) => {
   };
 
   const stopCamera = () => {
+    stopLoop();
     const video = videoRef.current;
     if (video?.srcObject) {
       (video.srcObject as MediaStream).getTracks().forEach((t) => t.stop());
@@ -120,13 +117,13 @@ const StepCamera = ({ onNext }: Props) => {
       className="min-h-screen flex flex-col items-center justify-center px-6 py-20"
     >
       <h2 className="font-display text-3xl text-primary mb-2 text-center">📸 Birthday Selfie!</h2>
-      <p className="text-muted-foreground text-center mb-6">get your birthday look on, Ria!</p>
+      <p className="text-muted-foreground text-center mb-6">show the tiny monster your best look! 😈</p>
 
       <div className="w-full max-w-sm">
         {!streaming && !captured && (
           <div className="text-center bg-card rounded-3xl p-8 shadow-xl border-2 border-primary/20">
             <p className="text-5xl mb-4">📷</p>
-            <p className="text-muted-foreground mb-6">take a birthday selfie with filters!</p>
+            <p className="text-muted-foreground mb-6">take a birthday selfie with Ria!</p>
             <div className="flex flex-col gap-3">
               <motion.button
                 whileTap={{ scale: 0.95 }}
@@ -147,23 +144,14 @@ const StepCamera = ({ onNext }: Props) => {
 
         {streaming && (
           <div className="space-y-3">
+            {/* Hidden video element - canvas shows the preview */}
             <video ref={videoRef} className="hidden" playsInline muted />
-            <canvas ref={canvasRef} className="w-full rounded-3xl shadow-xl border-2 border-primary/20" />
-            <div className="flex gap-2 justify-center">
-              {(["cap", "glasses", "both"] as const).map((f) => (
-                <button
-                  key={f}
-                  onClick={() => setFilter(f)}
-                  className={`px-3 py-1.5 rounded-full font-semibold text-xs transition-all ${
-                    filter === f
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-card text-foreground border-2 border-border"
-                  }`}
-                >
-                  {f === "cap" ? "🎩 Cap" : f === "glasses" ? "👓 Glasses" : "✨ Both"}
-                </button>
-              ))}
-            </div>
+            {/* Canvas is the actual visible preview */}
+            <canvas
+              ref={canvasRef}
+              className="w-full rounded-3xl shadow-xl border-2 border-primary/20"
+              style={{ display: "block" }}
+            />
             <div className="flex gap-2 justify-center">
               <button onClick={capture} className="bg-primary text-primary-foreground px-5 py-2.5 rounded-full font-bold">
                 📸 Snap!
